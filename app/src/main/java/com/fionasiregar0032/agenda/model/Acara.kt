@@ -2,8 +2,8 @@ package com.fionasiregar0032.agenda.model
 
 data class Acara(
     val id: Long = 0L,
-    val eventName: String,
-    val eventDate: String,
+    val acaraName: String,
+    val acaraDate: String,
     val startTime: String,
     val endTime: String,
     val location: String,
@@ -11,4 +11,4 @@ data class Acara(
     val activityType: String
 )
 
-val eventTypes = listOf("Seminar", "Webinar", "Pelatihan", "Talkshow", "Kuliah Umum", "Bootcamp")
+val acaraTypes = listOf("Seminar", "Webinar", "Pelatihan", "Talkshow", "Kuliah Umum", "Bootcamp")
