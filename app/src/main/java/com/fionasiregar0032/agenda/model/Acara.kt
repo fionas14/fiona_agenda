@@ -1,7 +1,7 @@
 package com.fionasiregar0032.agenda.model
 
 data class Acara(
-    val id: Long = 0L,
+    val acaraId: Long = 0L,
     val acaraName: String,
     val acaraDate: String,
     val startTime: String,

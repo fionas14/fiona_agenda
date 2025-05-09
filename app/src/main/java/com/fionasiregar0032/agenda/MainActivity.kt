@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.fionasiregar0032.agenda.screen.MainScreen
+import androidx.navigation.compose.rememberNavController
+import com.fionasiregar0032.agenda.navigation.AppNavigation
+
 import com.fionasiregar0032.agenda.ui.theme.AgendaTheme
 
 class MainActivity : ComponentActivity() {
@@ -12,9 +14,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AgendaTheme {
-            }
-            MainScreen()
+                AgendaTheme {
+                    val navController = rememberNavController()
+                    AppNavigation(navController = navController)
+                }
         }
     }
 }

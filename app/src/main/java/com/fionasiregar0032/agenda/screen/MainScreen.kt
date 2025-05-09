@@ -23,7 +23,9 @@ import com.fionasiregar0032.agenda.ui.theme.AgendaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
+fun MainScreen(
+    mainViewModel: MainViewModel = viewModel(),
+    onNavigateToForm: (Long?) -> Unit ){
     val acara by mainViewModel.acara.collectAsState()
     Scaffold (
         containerColor = Color(0xFFFFF5E1),
@@ -39,10 +41,13 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { }) {
+            FloatingActionButton(onClick = {
+                onNavigateToForm(null)
+            }) {
                 Icon(Icons.Filled.Add, contentDescription = "Tambah Acara")
             }
-        }
+
+}
     ) { paddingValues ->
         if (acara.isEmpty()) {
             Box(
@@ -61,7 +66,7 @@ fun MainScreen(mainViewModel: MainViewModel = viewModel()) {
                     .padding(horizontal = 16.dp)
             ) {
                 items(acara) { item ->
-                    AcaraListItem(acara = item, onClick = { /* TODO */ })
+                    AcaraListItem(acara = item, onClick = {  })
                     Divider()
                 }
             }
@@ -89,6 +94,6 @@ fun AcaraListItem(acara: Acara, onClick: () -> Unit) {
 @Composable
 fun MainScreenPreview() {
     AgendaTheme {
-        MainScreen()
+
     }
 }
