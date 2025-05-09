@@ -1,7 +1,12 @@
 package com.fionasiregar0032.agenda.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "acara_table")
 data class Acara(
-    val acaraId: Long = 0L,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0L,
     val acaraName: String,
     val acaraDate: String,
     val startTime: String,
@@ -11,4 +16,4 @@ data class Acara(
     val activityType: String
 )
 
-val acaraTypes = listOf("Seminar", "Webinar", "Pelatihan", "Talkshow", "Kuliah Umum", "Bootcamp")
+val acaraTypes = listOf("Seminar", "Workshop", "Pertemuan", "Lainnya")
