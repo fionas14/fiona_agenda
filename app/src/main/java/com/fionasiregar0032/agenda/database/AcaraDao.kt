@@ -19,4 +19,13 @@ interface AcaraDao {
 
     @Query("SELECT * FROM acara_table WHERE id = :acaraId")
     fun getAcaraById(acaraId: Long): Flow<Acara?>
+
+    @Query("SELECT * FROM acara_table WHERE isDeleted = 0 ORDER BY acaraDate DESC")
+    fun getActiveAcara(): Flow<List<Acara>>
+
+    @Query("SELECT * FROM acara_table WHERE isDeleted = 1 ORDER BY acaraDate DESC")
+    fun getDeletedAcara(): Flow<List<Acara>>
+
+
+
 }

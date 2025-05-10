@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AgendaTheme { // Pastikan EventAppTheme ada di package ui.theme
+            AgendaTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -27,4 +27,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-

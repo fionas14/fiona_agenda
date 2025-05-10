@@ -4,6 +4,7 @@ import androidx.navigation.navArgument
 
 sealed class AppRoute(val route: String) {
     object MainScreen : AppRoute("main_screen")
+    object RecycleBin : AppRoute("recycle_bin")
     object AcaraFormScreen : AppRoute("acara_form_screen") {
         const val ACARA_ID_KEY = "acaraId"
 
@@ -21,5 +22,6 @@ sealed class AppRoute(val route: String) {
                 "acara_form_screen"
             }
         }
+
     }
 }

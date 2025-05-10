@@ -120,7 +120,8 @@ fun AcaraFormScreen(
                     endTime = endTime.trim(),
                     location = location.trim(),
                     description = description.trim(),
-                    activityType = selectedActivityType
+                    activityType = selectedActivityType,
+                    isDeleted = false
                 )
 
                 viewModel.saveAcara(acaraToSave) { success ->
@@ -154,7 +155,7 @@ fun AcaraFormScreen(
                 OutlinedTextField(
                     value = acaraName,
                     onValueChange = { acaraName = it },
-                    label = { Text(stringResource(R.string.nama_acara)) },
+                    label = { Text(stringResource(R.string.nama_acara),color = Color.Black) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -163,21 +164,21 @@ fun AcaraFormScreen(
                     OutlinedTextField(
                         value = acaraDate,
                         onValueChange = { acaraDate = it },
-                        label = { Text(stringResource(R.string.tanggal_acara)) },
+                        label = { Text(stringResource(R.string.tanggal_acara),color = Color.Black) },
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedTextField(
                         value = startTime,
                         onValueChange = { startTime = it },
-                        label = { Text(stringResource(R.string.waktu_mulai)) },
+                        label = { Text(stringResource(R.string.waktu_mulai),color = Color.Black) },
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedTextField(
                         value = endTime,
                         onValueChange = { endTime = it },
-                        label = { Text(stringResource(R.string.waktu_selesai)) },
+                        label = { Text(stringResource(R.string.waktu_selesai),color = Color.Black) },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -185,7 +186,7 @@ fun AcaraFormScreen(
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
-                    label = { Text(stringResource(R.string.lokasi)) },
+                    label = { Text(stringResource(R.string.lokasi),color = Color.Black) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -193,13 +194,13 @@ fun AcaraFormScreen(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text(stringResource(R.string.deskripsi)) },
+                    label = { Text(stringResource(R.string.deskripsi),color = Color.Black) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3,
                     maxLines = 5
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(stringResource(R.string.jenis_kegiatan), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.jenis_kegiatan), style = MaterialTheme.typography.titleMedium,color = Color.Black)
 
                 Column {
                     acaraTypes.forEach { type ->
@@ -220,7 +221,7 @@ fun AcaraFormScreen(
                             Text(
                                 text = type,
                                 style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(start = 8.dp)
+                                modifier = Modifier.padding(start = 8.dp), color = Color.Black
                             )
                         }
                     }
@@ -235,12 +236,12 @@ fun AcaraFormScreen(
         DeleteConfirmationDialog(
             acaraToDelete = acaraBeingEdited!!,
             onConfirm = {
-                viewModel.deleteAcara(acaraBeingEdited!!) { success ->
+                viewModel.deleteAcara(acaraBeingEdited!!.copy(isDeleted = true)) { success ->
                     coroutineScope.launch {
                         if (success) {
                             Toast.makeText(
                                 context,
-                                "Acara '${acaraBeingEdited!!.acaraName}' dihapus",
+                                "Acara '${acaraBeingEdited!!.acaraName}' dipindahkan ke Recycle Bin",
                                 Toast.LENGTH_SHORT
                             ).show()
                             navController.popBackStack()
@@ -264,7 +265,7 @@ fun DeleteConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.konfirmasi_hapus)) },
+        title = { Text(stringResource(R.string.konfirmasi_hapus),color = Color.Black) },
         text = { Text(stringResource(R.string.pesan_konfirmasi, acaraToDelete.acaraName)) },
         confirmButton = {
             Button(

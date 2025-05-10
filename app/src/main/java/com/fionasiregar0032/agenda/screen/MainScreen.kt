@@ -1,6 +1,7 @@
 package com.fionasiregar0032.agenda.screen
 
 import android.app.Application
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,15 +34,18 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
-    onNavigateToForm: (Long?) -> Unit
+    onNavigateToForm: (Long?) -> Unit,
+    onNavigateToRecycleBin: () -> Unit
 ) {
     val context = LocalContext.current
-    val acara by mainViewModel.acara.collectAsState()
+    val acaraList by mainViewModel.activeAcara.collectAsState(initial = emptyList())
     val settingsDataStore = remember { SettingsDataStore(context) }
     val layoutMode by settingsDataStore.layoutModeFlow.collectAsState(initial = true)
     val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color(0xFFFFF5E1),
         topBar = {
             TopAppBar(
@@ -58,6 +63,12 @@ fun MainScreen(
                             contentDescription = if (layoutMode) "Grid View" else "List View"
                         )
                     }
+                    IconButton(onClick = onNavigateToRecycleBin) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_delete_24),
+                            contentDescription = "Recycle Bin"
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = Color(0xFFFF69B4),
@@ -71,14 +82,14 @@ fun MainScreen(
             }
         }
     ) { paddingValues ->
-        if (acara.isEmpty()) {
+        if (acaraList.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Belum ada acara.")
+                Text("Belum ada acara.", color = Color.Black)
             }
         } else {
             if (layoutMode) {
@@ -88,8 +99,23 @@ fun MainScreen(
                         .padding(paddingValues)
                         .padding(all = 8.dp)
                 ) {
-                    items(acara, key = { it.id }) { acaraItem ->
-                        AcaraListItem(acara = acaraItem, onClick = { onNavigateToForm(acaraItem.id) })
+                    items(acaraList, key = { it.id }) { acaraItem ->
+                        AcaraListItem(
+                            acara = acaraItem,
+                            onClick = { onNavigateToForm(acaraItem.id) },
+                            onDelete = { deletedItem ->
+                                coroutineScope.launch {
+                                    mainViewModel.softDeleteAcara(deletedItem)
+                                    val result = snackbarHostState.showSnackbar(
+                                        message = "Acara dihapus",
+                                        actionLabel = "Undo"
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        mainViewModel.restoreAcara(deletedItem)
+                                    }
+                                }
+                            }
+                        )
                         HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
                     }
                 }
@@ -101,8 +127,10 @@ fun MainScreen(
                         .padding(paddingValues)
                         .padding(all = 8.dp)
                 ) {
-                    items(acara, key = { it.id }) { acaraItem ->
-                        AcaraGridItem(acara = acaraItem, onClick = { onNavigateToForm(acaraItem.id) })
+                    items(acaraList, key = { it.id }) { acaraItem ->
+                        AcaraGridItem(
+                            acara = acaraItem,
+                            onClick = { onNavigateToForm(acaraItem.id) })
                     }
                 }
             }
@@ -111,15 +139,22 @@ fun MainScreen(
 }
 
 @Composable
-fun AcaraListItem(acara: Acara, onClick: () -> Unit) {
+fun AcaraListItem(acara: Acara, onClick: () -> Unit, onDelete: (Acara) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(vertical = 12.dp, horizontal = 8.dp)
     ) {
-        Text(text = acara.acaraName, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurface)
-        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = acara.acaraName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            IconButton(onClick = { onDelete(acara) }) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+            }
+        }
         InfoRow("Tanggal:", "${acara.acaraDate} (${acara.startTime} - ${acara.endTime})")
         InfoRow("Lokasi:", acara.location)
         InfoRow("Jenis:", acara.activityType)
@@ -165,15 +200,19 @@ fun AcaraGridItem(acara: Acara, onClick: () -> Unit) {
 @Composable
 fun InfoRow(label: String, value: String) {
     Row {
-        Text(text = "$label ", fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text = "$label ",
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Text(text = value, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun MainScreenPreview() {
     AgendaTheme {
-        // Kosong karena butuh parameter MainViewModel dan navigasi
     }
 }
