@@ -25,24 +25,20 @@ import androidx.compose.ui.unit.sp
 import com.fionasiregar0032.agenda.R
 import com.fionasiregar0032.agenda.model.Acara
 import com.fionasiregar0032.agenda.ui.theme.AgendaTheme
-import com.fionasiregar0032.agenda.ui.theme.AppTheme
 import com.fionasiregar0032.agenda.util.SettingsDataStore
 import com.fionasiregar0032.agenda.viewmodel.MainViewModel
-import com.fionasiregar0032.agenda.viewmodel.ThemeViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
-    themeViewModel: ThemeViewModel,
     onNavigateToForm: (Long?) -> Unit,
     onNavigateToRecycleBin: () -> Unit
 ) {
     val context = LocalContext.current
     val acaraList by mainViewModel.activeAcara.collectAsState(initial = emptyList())
     val settingsDataStore = remember { SettingsDataStore(context) }
-    val theme by themeViewModel.theme.collectAsState()
     val layoutMode by settingsDataStore.layoutModeFlow.collectAsState(initial = true)
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -55,13 +51,9 @@ fun MainScreen(
                 title = { Text("Agenda") },
                 actions = {
                     IconButton(onClick = {
-                        themeViewModel.setTheme(
-                            when (theme) {
-                                AppTheme.LIGHT -> AppTheme.DARK
-                                AppTheme.DARK -> AppTheme.SYSTEM
-                                else -> AppTheme.LIGHT
-                            }
-                        )
+                        coroutineScope.launch {
+                            settingsDataStore.saveLayoutMode(!layoutMode)
+                        }
                     }) {
                         Icon(
                             painter = painterResource(
@@ -135,7 +127,9 @@ fun MainScreen(
                         .padding(all = 8.dp)
                 ) {
                     items(acaraList, key = { it.id }) { acaraItem ->
-                        AcaraGridItem(acara = acaraItem, onClick = { onNavigateToForm(acaraItem.id) })
+                        AcaraGridItem(
+                            acara = acaraItem,
+                            onClick = { onNavigateToForm(acaraItem.id) })
                     }
                 }
             }
@@ -205,7 +199,12 @@ fun AcaraGridItem(acara: Acara, onClick: () -> Unit) {
 @Composable
 fun InfoRow(label: String, value: String) {
     Row {
-        Text(text = "$label ", fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            text = "$label ",
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Text(text = value, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
@@ -214,6 +213,5 @@ fun InfoRow(label: String, value: String) {
 @Composable
 fun MainScreenPreview() {
     AgendaTheme {
-        // Kosong karena butuh parameter MainViewModel dan navigasi
     }
 }

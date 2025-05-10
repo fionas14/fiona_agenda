@@ -236,7 +236,6 @@ fun AcaraFormScreen(
         DeleteConfirmationDialog(
             acaraToDelete = acaraBeingEdited!!,
             onConfirm = {
-                // Soft delete: mark as isDeleted = true
                 viewModel.deleteAcara(acaraBeingEdited!!.copy(isDeleted = true)) { success ->
                     coroutineScope.launch {
                         if (success) {

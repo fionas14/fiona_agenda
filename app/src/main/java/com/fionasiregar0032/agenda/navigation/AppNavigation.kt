@@ -27,7 +27,7 @@ fun AppNavigation(navController: NavHostController) {
                 onNavigateToForm = { eventId ->
                     navController.navigate(AppRoute.AcaraFormScreen.buildRoute(eventId))
                 },
-                onNavigateToRecycleBin = { // ✅ tambahkan ini
+                onNavigateToRecycleBin = {
                     navController.navigate(AppRoute.RecycleBin.route)
                 }
             )
