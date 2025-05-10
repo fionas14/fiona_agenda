@@ -1,6 +1,5 @@
 package com.fionasiregar0032.agenda.screen
 
-import android.app.Application
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

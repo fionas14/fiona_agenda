@@ -11,4 +11,6 @@
     <string name="pesan_konfirmasi">Konfirmasi hapus %1$s?</string>
     <string name="hapus"> "Hapus"</string>
     <string name="batal"> "Batal"</string>
+    <string name="balik"> "Kembali"</string>
+
 </resources>
