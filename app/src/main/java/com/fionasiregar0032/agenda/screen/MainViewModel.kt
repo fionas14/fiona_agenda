@@ -1,17 +1,18 @@
 package com.fionasiregar0032.agenda.screen
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.fionasiregar0032.agenda.model.Acara
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.fionasiregar0032.agenda.repository.AcaraRepository
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
-class MainViewModel : ViewModel() {
-    private val _acara = MutableStateFlow<List<Acara>>(emptyList())
-    val acara: StateFlow<List<Acara>> = _acara
-    init {
-        val dummyAcara = listOf(
-            Acara(1, "Seminar Magang FIT", "2025-05-10", "10:00", "13:00", "Aula Lantai 3", "Seminar magang bagi mahasiswa semester 4", "Seminar"),
+class MainViewModel(private val repository: AcaraRepository) : ViewModel() {
+    val acara: StateFlow<List<Acara>> = repository.allAcara
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
         )
-        _acara.value = dummyAcara
-    }
 }

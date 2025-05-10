@@ -8,7 +8,7 @@ import com.fionasiregar0032.agenda.model.Acara
 
 @Database(entities = [Acara::class], version = 1, exportSchema = false)
 abstract class AcaraDb: RoomDatabase() {
-    abstract fun AcaraDao(): AcaraDao
+    abstract fun acaraDao(): AcaraDao
 
     companion object {
         @Volatile

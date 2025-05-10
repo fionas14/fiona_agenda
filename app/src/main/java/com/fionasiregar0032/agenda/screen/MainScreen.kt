@@ -1,5 +1,6 @@
 package com.fionasiregar0032.agenda.screen
 
+import android.app.Application
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,20 +22,23 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fionasiregar0032.agenda.model.Acara
 import com.fionasiregar0032.agenda.ui.theme.AgendaTheme
+import com.fionasiregar0032.agenda.util.ViewModelFactory
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    mainViewModel: MainViewModel = viewModel(),
-    onNavigateToForm: (Long?) -> Unit ){
+    onNavigateToForm: (Long?) -> Unit
+) {
+    val application = LocalContext.current.applicationContext as Application
+    val mainViewModel: MainViewModel = viewModel(factory = ViewModelFactory(application))
     val acara by mainViewModel.acara.collectAsState()
-    Scaffold (
+
+    Scaffold(
         containerColor = Color(0xFFFFF5E1),
         topBar = {
             TopAppBar(
-                title = {
-                    Text(text = "Agenda")
-                },
+                title = { Text("Agenda") },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = Color(0xFFFF69B4),
                     titleContentColor = Color.Black,
@@ -41,13 +46,10 @@ fun MainScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                onNavigateToForm(null)
-            }) {
+            FloatingActionButton(onClick = { onNavigateToForm(null) }) {
                 Icon(Icons.Filled.Add, contentDescription = "Tambah Acara")
             }
-
-}
+        }
     ) { paddingValues ->
         if (acara.isEmpty()) {
             Box(
@@ -66,13 +68,14 @@ fun MainScreen(
                     .padding(horizontal = 16.dp)
             ) {
                 items(acara) { item ->
-                    AcaraListItem(acara = item, onClick = {  })
+                    AcaraListItem(acara = item, onClick = { /* TODO */ })
                     Divider()
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun AcaraListItem(acara: Acara, onClick: () -> Unit) {

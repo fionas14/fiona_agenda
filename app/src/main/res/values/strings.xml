@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Agenda</string>
+    <string name="nama_acara">Nama Kegiatan</string>
+    <string name="tanggal_acara"> Tanggal Acara (YYYY-MM-DD)"</string>
+    <string name="waktu_mulai"> "Waktu Mulai (HH:MM)"</string>
+    <string name="waktu_selesai"> "Waktu Selesai (HH:MM)"</string>
+    <string name="lokasi"> "Lokasi"</string>
+    <string name="deskripsi"> "Deskripsi Kegiatan"</string>
+    <string name="jenis_kegiatan"> "Jenis Kegiatan"</string>
+    <string name="konfirmasi_hapus"> "Konfirmasi Hapus"</string>
+    <string name="tidak_ada_jenis_kegiatan"> "Tidak Ada Jenis Kegiatan Tersedia"</string>
+    <string name="pesan_konfirmasi"> "Apakah Anda yakin ingin menghapus acara ini?"</string>
+    <string name="hapus"> "Hapus"</string>
+    <string name="batal"> "Batal"</string>
 </resources>

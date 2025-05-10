@@ -8,11 +8,11 @@ interface AcaraDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAcara(acara: Acara)
 
-    @Update
-    suspend fun updateAcara(acara: Acara)
-
     @Delete
     suspend fun deleteAcara(acara: Acara)
+
+    @Update
+    suspend fun updateAcara(acara: Acara)
 
     @Query("SELECT * FROM acara_table ORDER BY acaraDate DESC, startTime DESC")
     fun getAllAcara(): Flow<List<Acara>>
