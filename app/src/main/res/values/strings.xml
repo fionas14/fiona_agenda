@@ -8,8 +8,7 @@
     <string name="deskripsi"> "Deskripsi Kegiatan"</string>
     <string name="jenis_kegiatan"> "Jenis Kegiatan"</string>
     <string name="konfirmasi_hapus"> "Konfirmasi Hapus"</string>
-    <string name="tidak_ada_jenis_kegiatan"> "Tidak Ada Jenis Kegiatan Tersedia"</string>
-    <string name="pesan_konfirmasi"> "Apakah Anda yakin ingin menghapus acara ini?"</string>
+    <string name="pesan_konfirmasi">Konfirmasi hapus %1$s?</string>
     <string name="hapus"> "Hapus"</string>
     <string name="batal"> "Batal"</string>
 </resources>

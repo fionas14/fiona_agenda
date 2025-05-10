@@ -14,6 +14,7 @@ data class Acara(
     val location: String,
     val description: String,
     val activityType: String
+
 )
 
 val acaraTypes = listOf("Seminar", "Workshop", "Pertemuan", "Lainnya")

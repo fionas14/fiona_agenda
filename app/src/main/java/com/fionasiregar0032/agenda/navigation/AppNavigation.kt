@@ -1,29 +1,45 @@
 package com.fionasiregar0032.agenda.navigation
 
+import android.app.Application
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.fionasiregar0032.agenda.viewmodel.AcaraFormViewModel
 import com.fionasiregar0032.agenda.screen.AcaraFormScreen
 import com.fionasiregar0032.agenda.screen.MainScreen
+import com.fionasiregar0032.agenda.util.ViewModelFactory
+import com.fionasiregar0032.agenda.viewmodel.MainViewModel
+
 
 @Composable
-fun AppNavigation() {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "main") {
-        composable("main") {
+fun AppNavigation(navController: NavHostController) {
+    val application = LocalContext.current.applicationContext as Application
+    val factory = ViewModelFactory(application)
+
+    NavHost(navController = navController, startDestination = AppRoute.MainScreen.route) {
+        composable(AppRoute.MainScreen.route) {
+            val mainViewModelInstance: MainViewModel = viewModel(factory = factory)
             MainScreen(
-                onNavigateToForm = { acaraId ->
-                    navController.navigate("form/${acaraId ?: "new"}")
+                mainViewModel = mainViewModelInstance,
+                onNavigateToForm = { eventId ->
+                    navController.navigate(AppRoute.AcaraFormScreen.buildRoute(eventId))
                 }
             )
         }
-        composable("form/{acaraId}") { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("acaraId")
+        composable(
+            route = AppRoute.AcaraFormScreen.routeWithArgs,
+            arguments = AppRoute.AcaraFormScreen.arguments
+        ) { backStackEntry ->
+            val acaraId = backStackEntry.arguments?.getLong(AppRoute.AcaraFormScreen.ACARA_ID_KEY)
+            val acaraFormViewModelInstance: AcaraFormViewModel = viewModel(factory = factory)
+
             AcaraFormScreen(
                 navController = navController,
-                acaraId = id?.toLongOrNull()
+                acaraId = if (acaraId == -1L) null else acaraId,
+                viewModel = acaraFormViewModelInstance
             )
         }
     }
