@@ -120,7 +120,8 @@ fun AcaraFormScreen(
                     endTime = endTime.trim(),
                     location = location.trim(),
                     description = description.trim(),
-                    activityType = selectedActivityType
+                    activityType = selectedActivityType,
+                    isDeleted = false
                 )
 
                 viewModel.saveAcara(acaraToSave) { success ->
@@ -235,12 +236,13 @@ fun AcaraFormScreen(
         DeleteConfirmationDialog(
             acaraToDelete = acaraBeingEdited!!,
             onConfirm = {
-                viewModel.deleteAcara(acaraBeingEdited!!) { success ->
+                // Soft delete: mark as isDeleted = true
+                viewModel.deleteAcara(acaraBeingEdited!!.copy(isDeleted = true)) { success ->
                     coroutineScope.launch {
                         if (success) {
                             Toast.makeText(
                                 context,
-                                "Acara '${acaraBeingEdited!!.acaraName}' dihapus",
+                                "Acara '${acaraBeingEdited!!.acaraName}' dipindahkan ke Recycle Bin",
                                 Toast.LENGTH_SHORT
                             ).show()
                             navController.popBackStack()

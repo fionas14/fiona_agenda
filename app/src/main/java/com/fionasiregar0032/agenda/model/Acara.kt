@@ -13,7 +13,8 @@ data class Acara(
     val endTime: String,
     val location: String,
     val description: String,
-    val activityType: String
+    val activityType: String,
+    val isDeleted: Boolean = false
 
 )
 

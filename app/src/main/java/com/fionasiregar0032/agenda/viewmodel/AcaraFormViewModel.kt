@@ -4,16 +4,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fionasiregar0032.agenda.model.Acara
 import com.fionasiregar0032.agenda.repository.AcaraRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class AcaraFormViewModel(private val repository: AcaraRepository) : ViewModel() {
+class AcaraFormViewModel(
+    private val repository: AcaraRepository
+) : ViewModel() {
 
     private val _currentAcara = MutableStateFlow<Acara?>(null)
-    val currentAcara: StateFlow<Acara?> by lazy { _currentAcara.asStateFlow() }
+    val currentAcara: StateFlow<Acara?> = _currentAcara.asStateFlow()
+
+    fun prepareNewAcara() {
+        _currentAcara.value = null
+    }
 
     fun loadAcara(acaraId: Long) {
         viewModelScope.launch {
@@ -26,24 +29,23 @@ class AcaraFormViewModel(private val repository: AcaraRepository) : ViewModel() 
     fun saveAcara(acara: Acara, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
-                if (acara.id == 0L) { // Event baru
-                    repository.insert(acara)
-                } else { // Update event
-                    repository.update(acara)
+                if (acara.id == 0L) {
+                    repository.insertAcara(acara)
+                } else {
+                    repository.updateAcara(acara)
                 }
                 onResult(true)
             } catch (e: Exception) {
-                // Handle error, misalnya log atau tampilkan pesan
                 e.printStackTrace()
                 onResult(false)
             }
         }
     }
 
-    fun deleteAcara(acara: Acara,onResult: (Boolean) -> Unit) {
+    fun deleteAcara(acara: Acara, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             try {
-                repository.deleteAcara(acara)
+                repository.updateAcara(acara)
                 onResult(true)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -52,10 +54,5 @@ class AcaraFormViewModel(private val repository: AcaraRepository) : ViewModel() 
         }
     }
 
-    fun getAcaraById(id: Long): Flow<Acara?> {
-        return repository.getAcaraById(id)
-    }
-    fun prepareNewAcara() {
-        _currentAcara.value = null
-    }
+    fun getAcaraById(id: Long): Flow<Acara?> = repository.getAcaraById(id)
 }

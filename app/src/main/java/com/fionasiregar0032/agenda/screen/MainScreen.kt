@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,38 +25,55 @@ import androidx.compose.ui.unit.sp
 import com.fionasiregar0032.agenda.R
 import com.fionasiregar0032.agenda.model.Acara
 import com.fionasiregar0032.agenda.ui.theme.AgendaTheme
+import com.fionasiregar0032.agenda.ui.theme.AppTheme
 import com.fionasiregar0032.agenda.util.SettingsDataStore
 import com.fionasiregar0032.agenda.viewmodel.MainViewModel
+import com.fionasiregar0032.agenda.viewmodel.ThemeViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
-    onNavigateToForm: (Long?) -> Unit
+    themeViewModel: ThemeViewModel,
+    onNavigateToForm: (Long?) -> Unit,
+    onNavigateToRecycleBin: () -> Unit
 ) {
     val context = LocalContext.current
-    val acara by mainViewModel.acara.collectAsState()
+    val acaraList by mainViewModel.activeAcara.collectAsState(initial = emptyList())
     val settingsDataStore = remember { SettingsDataStore(context) }
+    val theme by themeViewModel.theme.collectAsState()
     val layoutMode by settingsDataStore.layoutModeFlow.collectAsState(initial = true)
     val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color(0xFFFFF5E1),
         topBar = {
             TopAppBar(
                 title = { Text("Agenda") },
                 actions = {
                     IconButton(onClick = {
-                        coroutineScope.launch {
-                            settingsDataStore.saveLayoutMode(!layoutMode)
-                        }
+                        themeViewModel.setTheme(
+                            when (theme) {
+                                AppTheme.LIGHT -> AppTheme.DARK
+                                AppTheme.DARK -> AppTheme.SYSTEM
+                                else -> AppTheme.LIGHT
+                            }
+                        )
                     }) {
                         Icon(
                             painter = painterResource(
                                 id = if (layoutMode) R.drawable.baseline_grid_view_24 else R.drawable.baseline_view_list_24
                             ),
                             contentDescription = if (layoutMode) "Grid View" else "List View"
+                        )
+                    }
+                    IconButton(onClick = onNavigateToRecycleBin) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_delete_24),
+                            contentDescription = "Recycle Bin"
                         )
                     }
                 },
@@ -71,7 +89,7 @@ fun MainScreen(
             }
         }
     ) { paddingValues ->
-        if (acara.isEmpty()) {
+        if (acaraList.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -88,8 +106,23 @@ fun MainScreen(
                         .padding(paddingValues)
                         .padding(all = 8.dp)
                 ) {
-                    items(acara, key = { it.id }) { acaraItem ->
-                        AcaraListItem(acara = acaraItem, onClick = { onNavigateToForm(acaraItem.id) })
+                    items(acaraList, key = { it.id }) { acaraItem ->
+                        AcaraListItem(
+                            acara = acaraItem,
+                            onClick = { onNavigateToForm(acaraItem.id) },
+                            onDelete = { deletedItem ->
+                                coroutineScope.launch {
+                                    mainViewModel.softDeleteAcara(deletedItem)
+                                    val result = snackbarHostState.showSnackbar(
+                                        message = "Acara dihapus",
+                                        actionLabel = "Undo"
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        mainViewModel.restoreAcara(deletedItem)
+                                    }
+                                }
+                            }
+                        )
                         HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
                     }
                 }
@@ -101,7 +134,7 @@ fun MainScreen(
                         .padding(paddingValues)
                         .padding(all = 8.dp)
                 ) {
-                    items(acara, key = { it.id }) { acaraItem ->
+                    items(acaraList, key = { it.id }) { acaraItem ->
                         AcaraGridItem(acara = acaraItem, onClick = { onNavigateToForm(acaraItem.id) })
                     }
                 }
@@ -111,15 +144,22 @@ fun MainScreen(
 }
 
 @Composable
-fun AcaraListItem(acara: Acara, onClick: () -> Unit) {
+fun AcaraListItem(acara: Acara, onClick: () -> Unit, onDelete: (Acara) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(vertical = 12.dp, horizontal = 8.dp)
     ) {
-        Text(text = acara.acaraName, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurface)
-        Spacer(modifier = Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = acara.acaraName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            IconButton(onClick = { onDelete(acara) }) {
+                Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
+            }
+        }
         InfoRow("Tanggal:", "${acara.acaraDate} (${acara.startTime} - ${acara.endTime})")
         InfoRow("Lokasi:", acara.location)
         InfoRow("Jenis:", acara.activityType)
