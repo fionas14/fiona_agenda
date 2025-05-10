@@ -15,7 +15,6 @@ class ViewModelFactory(private val application: Application) : ViewModelProvider
         val eventRepository by lazy {
             AcaraRepository(AcaraDb.getDatabase(application).acaraDao())
         }
-
         return when {
             modelClass.isAssignableFrom(MainViewModel::class.java) -> {
                 MainViewModel(eventRepository) as T
