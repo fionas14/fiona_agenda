@@ -47,6 +47,7 @@ fun AppNavigation(navController: NavHostController) {
             )
         }
 
+        
         composable(AppRoute.RecycleBin.route) {
             val mainViewModelInstance: MainViewModel = viewModel(factory = factory)
             RecycleBinScreen(
